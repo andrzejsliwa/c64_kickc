@@ -39,14 +39,15 @@ C_ASMS  = $(addprefix $(BUILD_DIR)/,$(notdir $(C_FILES:$(EXTENSION_C)=$(EXTENSIO
 C_SOURCES  = $(addprefix $(BUILD_DIR)/,$(notdir $(C_FILES:$(EXTENSION_C)=$(EXTENSION_C))))
 
 
-all:
-	$(OUTPUT_COMMAND)make start $(DEFAULT_PRG)
+all: start
 
 .PHONY : run_debug
 
-start: clean compile run_vice ## build and start emulator (optionally with name of program)
+start: clean compile ## build and start emulator (optionally with name of program)
+	$(OUTPUT_COMMAND)make run_vice $(DEFAULT_PRG)
 
-debug: clean compile run_debug ## build and run in debugger (optionally with name of program)
+debug: clean compile ## build and run in debugger (optionally with name of program)
+	$(OUTPUT_COMMAND)make run_debug $(DEFAULT_PRG)
 
 $(BUILD_DIR):
 	$(OUTPUT_COMMAND)mkdir -p $(BUILD_DIR)
@@ -78,13 +79,12 @@ clean: ## clean build directory
 
 compile: $(BUILD_DIR) $(C_ASMS) $(ASM_PRGS) ## compile KICK C source files (src/*.c)
 
-ifeq (start,$(firstword $(MAKECMDGOALS)))
+ifeq (run_vice,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "start"
   START_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn argument to starting config
   ifneq ($(START_ARGS),)
 	APP_NAME  := $(firstword $(START_ARGS))
-	START_APP := $(DISK):$(APP_NAME)
   endif
 
   $(eval $(START_ARGS):;@:)
