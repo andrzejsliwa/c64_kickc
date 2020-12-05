@@ -11,7 +11,6 @@ KICKC_PLATFORM      ?= $(KICKC_HOME)/target
 KICKC_JAR           ?= jar/kickc-0.8.4.jar
 KICKASS_JAR         ?= jar/KickAss.jar
 
-EXTENSION_BASIC    ?=.bas
 EXTENSION_ASSEMBLY ?=.asm
 EXTENSION_C        ?=.c
 EXTENSION_INCLUDES ?=.i
