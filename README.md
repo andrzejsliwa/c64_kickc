@@ -13,21 +13,32 @@ Help:
   make compile             compile KICK C source files (src/*.c)
 ```
 
-Basic Run (compile and execute C64Debugger)
+Basic Build & Run in Vice
 ```bash
 *[main][~/game]$ make
 ...
 ```
 
-Verbose Run (compile and execute C64Debugger)
+Basic Build & Run in C64Debugger
+```bash
+*[main][~/game]$ make debug
+...
+```
+Verbose Build & Run in Vice
 ```bash
 *[main][~/game]$ VERBOSE=true make
 ...
 ```
 
-Run Specific Prg (compile and execute C64Debugger)
+Build & Run Specific Prg in Vice
 ```bash
 *[main][~/game]$ make start empty
+...
+```
+
+Build & Run Specific Prg in C64Debugger
+```bash
+*[main][~/game]$ make debug empty
 ...
 ```
 
