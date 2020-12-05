@@ -69,6 +69,7 @@ $(BUILD_DIR)/%$(EXTENSION_PROGRAM): $(BUILD_DIR)/%$(EXTENSION_ASSEMBLY)
 		-aom \
 		-showmem \
 		-debugdump \
+		-vicesymbols \
 		-symbolfile \
 		-symbolfiledir ../$(BUILD_DIR) \
 
