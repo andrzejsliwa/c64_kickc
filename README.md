@@ -18,3 +18,9 @@ Basic Run (compile and execute C64Debugger)
 *[main][~/game]$ make
 ...
 ```
+
+Verbose Run (compile and execute C64Debugger)
+```bash
+*[main][~/game]$ VERBOSE=true make
+...
+```

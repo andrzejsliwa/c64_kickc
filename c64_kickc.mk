@@ -1,4 +1,4 @@
-VERBOSE   ?= true
+VERBOSE   ?= false
 
 DEBUGGER_PATH ?= /Applications/C64\ Debugger.app/Contents/MacOS/C64Debugger
 DEBUGGER_OPTS ?= -pass -unpause -autojmp -wait 250
