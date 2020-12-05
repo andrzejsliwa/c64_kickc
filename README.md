@@ -24,3 +24,9 @@ Verbose Run (compile and execute C64Debugger)
 *[main][~/game]$ VERBOSE=true make
 ...
 ```
+
+Run Specific Prg (compile and execute C64Debugger)
+```bash
+*[main][~/game]$ make start empty
+...
+```
