@@ -12,3 +12,9 @@ Help:
   make clean               clean build directory
   make compile             compile KICK C source files (src/*.c)
 ```
+
+Basic Run (compile and execute C64Debugger)
+```bash
+*[main][~/game]$ make
+...
+```
