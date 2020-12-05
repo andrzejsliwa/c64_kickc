@@ -37,15 +37,8 @@ C_ASMS  = $(addprefix $(BUILD_DIR)/,$(notdir $(C_FILES:$(EXTENSION_C)=$(EXTENSIO
 C_SOURCES  = $(addprefix $(BUILD_DIR)/,$(notdir $(C_FILES:$(EXTENSION_C)=$(EXTENSION_C))))
 
 
-all: start
-
-.PHONY : run_debug
-
-start: clean compile ## build and start emulator (optionally with name of program)
-	$(OUTPUT_COMMAND)make run_vice $(DEFAULT_PRG)
-
-debug: clean compile ## build and run in debugger (optionally with name of program)
-	$(OUTPUT_COMMAND)make run_debug $(DEFAULT_PRG)
+all:
+	$(OUTPUT_COMMAND)make start $(DEFAULT_PRG)
 
 $(BUILD_DIR):
 	$(OUTPUT_COMMAND)mkdir -p $(BUILD_DIR)
@@ -77,34 +70,38 @@ clean: ## clean build directory
 
 compile: $(BUILD_DIR) $(C_ASMS) $(ASM_PRGS) ## compile KICK C source files (src/*.c)
 
-ifeq (run_vice,$(firstword $(MAKECMDGOALS)))
+ifeq (start,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "start"
   START_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn argument to starting config
   ifneq ($(START_ARGS),)
 	APP_NAME  := $(firstword $(START_ARGS))
+  else
+  	APP_NAME := $(DEFAULT_PRG)
   endif
 
   $(eval $(START_ARGS):;@:)
 endif
 
-ifeq (run_debug,$(firstword $(MAKECMDGOALS)))
+ifeq (debug,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "debug"
   DEBUG_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn argument to starting config
   ifneq ($(DEBUG_ARGS),)
-	APP_NAME  := $(firstword $(DEBUG_ARGS))
+	APP_NAME := $(firstword $(DEBUG_ARGS))
+  else
+	APP_NAME := $(DEFAULT_PRG)
   endif
 
   $(eval $(DEBUG_ARGS):;@:)
 endif
 
-run_vice:
+start: clean compile ## build and start emulator (optionally with name of program)
 	$(OUTPUT_COMMAND) killall $(notdir  $(VICE_PATH)) || true
 	$(OUTPUT_COMMAND) $(VICE_PATH) $(VICE_OPTS) \
 	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) $(OUTPUT_OPTIONS) &
 
-run_debug:
+debug: clean compile ## build and run in debugger (optionally with name of program)
 	$(OUTPUT_COMMAND)$(DEBUGGER_PATH) \
 		-prg $(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) \
 		$(DEBUGGER_OPTS) $(OUTPUT_OPTIONS)
