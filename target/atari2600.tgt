@@ -1,0 +1,12 @@
+{
+    "description": "Atari 2600 VCS 2K ROM in A26 executable file",
+    "extension": "a26",
+    "link": "atari2600.ld",
+    "cpu": "MOS6502X",
+    "zp_reserve": [ "0x00..0x7f" ],
+    "encoding": "screencode_atari",
+    "defines": {
+        "__ATARI2600__": 1
+    },
+    "emulator": "stella"
+}
