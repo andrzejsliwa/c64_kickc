@@ -5,7 +5,7 @@ Example project for C64 KickC
 ## Usage
 
 ```bash
-*[master][~/game]$ make help
+*[main][~/game]$ make help
 Help:
   make start               build and start emulator (optionally with name of program)
   make debug               build and run in debugger (optionally with name of program)
