@@ -30,3 +30,15 @@ Run Specific Prg (compile and execute C64Debugger)
 *[main][~/game]$ make start empty
 ...
 ```
+
+## Configuration
+
+in Makefile you can override paths or other configurations (in this case debugger and vice are available in PATH)
+
+```Makefile
+DEFAULT_PRG = game
+DEBUGGER_PATH = C64Debugger
+VICE_PATH     = x64sc
+
+include c64_kickc.mk
+```
