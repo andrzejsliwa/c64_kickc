@@ -102,6 +102,7 @@ ifeq (run_debug,$(firstword $(MAKECMDGOALS)))
 endif
 
 run_vice:
+	$(OUTPUT_COMMAND) killall $(notdir  $(VICE_PATH)) || true
 	$(OUTPUT_COMMAND) $(VICE_PATH) $(VICE_OPTS) \
 	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) 2>&1 $(OUTPUT_OPTIONS) &
 
