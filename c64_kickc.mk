@@ -1,4 +1,7 @@
-VERBOSE   ?= false
+VERBOSE   ?= true
+
+VICE_PATH     ?= /usr/local/bin/x64sc
+VICE_OPTS     ?=
 
 DEBUGGER_PATH ?= /Applications/C64\ Debugger.app/Contents/MacOS/C64Debugger
 DEBUGGER_OPTS ?= -pass -unpause -autojmp -wait 250
@@ -41,10 +44,9 @@ all:
 
 .PHONY : run_debug
 
-start: clean compile run_debug ## build and start emulator (optionally with name of program)
+start: clean compile run_vice ## build and start emulator (optionally with name of program)
 
-debug: clean compile  ## build and run in debugger (optionally with name of program)
-	$(OUTPUT_COMMAND)make run_debug $(DEFAULT_PRG)
+debug: clean compile run_debug ## build and run in debugger (optionally with name of program)
 
 $(BUILD_DIR):
 	$(OUTPUT_COMMAND)mkdir -p $(BUILD_DIR)
@@ -97,6 +99,10 @@ ifeq (run_debug,$(firstword $(MAKECMDGOALS)))
 
   $(eval $(DEBUG_ARGS):;@:)
 endif
+
+run_vice:
+	$(OUTPUT_COMMAND) $(VICE_PATH) $(VICE_OPTS) \
+	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) 2>&1 $(OUTPUT_OPTIONS) &
 
 run_debug:
 	$(OUTPUT_COMMAND)$(DEBUGGER_PATH) \
