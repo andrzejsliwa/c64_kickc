@@ -1,5 +1,3 @@
-VERBOSE   ?= true
-
 VICE_PATH     ?= /usr/local/bin/x64sc
 VICE_OPTS     ?=
 
@@ -24,7 +22,7 @@ ifdef VERBOSE
 	OUTPUT_OPTIONS=
 else
 	OUTPUT_COMMAND=@
-	OUTPUT_OPTIONS= #2>&1 > /dev/null
+	OUTPUT_OPTIONS= 2>&1 > /dev/null
 endif
 
 SOURCE_DIR = src
@@ -104,7 +102,7 @@ endif
 run_vice:
 	$(OUTPUT_COMMAND) killall $(notdir  $(VICE_PATH)) || true
 	$(OUTPUT_COMMAND) $(VICE_PATH) $(VICE_OPTS) \
-	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) 2>&1 $(OUTPUT_OPTIONS) &
+	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) $(OUTPUT_OPTIONS) &
 
 run_debug:
 	$(OUTPUT_COMMAND)$(DEBUGGER_PATH) \
