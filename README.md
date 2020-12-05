@@ -33,7 +33,7 @@ Run Specific Prg (compile and execute C64Debugger)
 
 ## Configuration
 
-in Makefile you can override paths or other configurations (in this case debugger and vice are available in PATH)
+In Makefile you can override paths or other configurations (in this case debugger and vice are available in PATH)
 
 ```Makefile
 DEFAULT_PRG = game
@@ -42,3 +42,7 @@ VICE_PATH     = x64sc
 
 include c64_kickc.mk
 ```
+
+## Examples
+
+In order to run examples, you need to copy them to src directory
