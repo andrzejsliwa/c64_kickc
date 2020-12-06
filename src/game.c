@@ -1,6 +1,7 @@
 
 #include <c64.h>
 #include <6502.h>
+#include <keyboard.h>
 
 byte* SCREEN   = $0400;
 byte* CHARSET  = $2000;
@@ -9,6 +10,7 @@ const byte MAX_CHARS = 4;
 
 byte* SPR_PTR = SCREEN + (40*25) + 16;
 
+byte player_x, player_y;
 void main() {
     *VIC_MEMORY = toD018(SCREEN, CHARSET);
 
@@ -16,39 +18,76 @@ void main() {
     *BORDER_COLOR = PINK;
 
     *SPRITES_ENABLE = %00000001;
-    *SPRITES_XPOS = 55;
-    *SPRITES_YPOS = 55;
+    *SPRITES_XPOS = player_x = 55;
+    *SPRITES_YPOS = player_y = 55;
     SPR_PTR[0] = $2100 / 64;
-    buildSprite(sprite1);
+    SPRITES_COLOR[0] = DARK_GREY;
 
 
-    initChar();
-    initColorMap();
-    initScreen();
+    build_sprite(sprite1);
 
-    BREAK();
-    while(true);
+    init_charset();
+    init_color_map();
+    init_screen();
+
+    //BREAK();
+    keyboard_init();
+
+
+    while(true) {
+        if (*RASTER == $32) {
+
+            byte direction_x = 0;
+            byte direction_y = 0;
+
+            if (keyboard_key_pressed(KEY_P)) {
+                if (player_x < 255) {
+                    direction_x = 1;
+                }
+            }
+
+            if (keyboard_key_pressed(KEY_O)) {
+                if (player_x >= 32) {
+                    direction_x = -1;
+                }
+
+            }
+
+            if (keyboard_key_pressed(KEY_Q)) {
+                if (player_y >= 32) {
+                    direction_y = -2;
+                }
+            } else {
+                direction_y = 1;
+            }
+
+            player_x = player_x + direction_x;
+            player_y = player_y + direction_y;
+            SPRITES_XPOS[0] = player_x;
+            SPRITES_YPOS[0] = player_y;
+        }
+    }
 }
 
-void initScreen() {
+void init_screen() {
     for(word i=0; i<40*25; i++) {
         SCREEN[i] = level[i];
     }
 }
 
-void initColorMap() {
+void init_color_map() {
     for(word i=0; i<40*25; i++) {
         COLS[i] = PURPLE;
     }
 }
 
-void initChar() {
+void init_charset() {
     for (char i: 0..MAX_CHARS * 8) {
         CHARSET[i] = tiles[i];
     }
 }
 
-void buildSprite(byte *spr) {
+void build_sprite(byte *spr) {
     for (char i: 0..63) {
         SPRITE_1[i] = spr[i];
     }
