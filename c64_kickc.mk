@@ -96,8 +96,10 @@ ifeq (debug,$(firstword $(MAKECMDGOALS)))
   $(eval $(DEBUG_ARGS):;@:)
 endif
 
-start: clean compile ## build and start emulator (optionally with name of program)
+kill_vice:
 	$(OUTPUT_COMMAND) killall $(notdir  $(VICE_PATH)) || true
+
+start: clean compile kill_vice ## build and start emulator (optionally with name of program)
 	$(OUTPUT_COMMAND) $(VICE_PATH) $(VICE_OPTS) \
 	$(BUILD_DIR)/$(APP_NAME)$(EXTENSION_PROGRAM) $(OUTPUT_OPTIONS) &
 
