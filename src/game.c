@@ -1,185 +1,95 @@
-
 #include <c64.h>
 #include <6502.h>
 #include <keyboard.h>
+#include <multiply.h>
+#include <stdio.h>
 
-byte* SCREEN   = $0400;
-byte* CHARSET  = $2000;
-byte* SPRITE_1 = $2100;
-const byte MAX_CHARS = 4;
+// Encoding needed for filename
+#pragma encoding(petscii_mixed)
 
-byte* SPR_PTR = SCREEN + (40*25) + 16;
+// Sprite file
+// #pragma data_seg(Sprite)
+// The sprite data
+// export __address(0x2040) char SPRITE[0x40] = kickasm(resource "balloon.png") {{
+//     .var pic = LoadPicture("src/balloon.png", List().add($000000, $ffffff))
+//     .for (var y=0; y<21; y++)
+//         .for (var x=0;x<3; x++)
+//             .byte pic.getSinglecolorByte(x,y)
+// }};
 
-byte player_x, player_y;
+// Program file
+#pragma data_seg(Data)
+
+char* const SCREEN = 0x0400;
+char* const SPRITES_PTR = SCREEN+SPRITE_PTRS;
+
 void main() {
-    *VIC_MEMORY = toD018(SCREEN, CHARSET);
-
-    *BG_COLOR = PINK;
-    *BORDER_COLOR = PINK;
-
-    *SPRITES_ENABLE = %00000001;
-    *SPRITES_XPOS = player_x = 55;
-    *SPRITES_YPOS = player_y = 55;
-    SPR_PTR[0] = $2100 / 64;
-    SPRITES_COLOR[0] = DARK_GREY;
-
-
-    build_sprite(sprite1);
-
-    init_charset();
-    init_color_map();
-    init_screen();
-
-    //BREAK();
-    keyboard_init();
-
+    word player_x = 24;
+    word player_y = 50;
 
     while(true) {
+        wait_for_vblank();
+
+        if (keyboard_key_pressed(KEY_A)) {
+            player_x--;
+        }
+
+        if (keyboard_key_pressed(KEY_D)) {
+            player_x++;
+        }
+
+        if (keyboard_key_pressed(KEY_W)) {
+            player_y--;
+        }
+
+        if (keyboard_key_pressed(KEY_S)) {
+            player_y++;
+        }
+        draw_all_sprites(player_x, player_y);
+    }
+}
+
+void draw_all_sprites(word x, word y) {
+    byte offset = 0;
+    for (byte i: 0..7) {
+        sprite_enable(i, true);
+        // SPRITES_PTR[i] = toSpritePtr(SPRITE);
+        sprite_position(i, x + offset, y);
+        offset += 25;
+    }
+    sprite_enable(1, false);
+}
+
+void wait_for_vblank() {
+    while(true) {
         if (*RASTER == $32) {
-
-            byte direction_x = 0;
-            byte direction_y = 0;
-
-            if (keyboard_key_pressed(KEY_P)) {
-                if (player_x < 255) {
-                    direction_x = 1;
-                }
-            }
-
-            if (keyboard_key_pressed(KEY_O)) {
-                if (player_x >= 32) {
-                    direction_x = -1;
-                }
-
-            }
-
-            if (keyboard_key_pressed(KEY_Q)) {
-                if (player_y >= 32) {
-                    direction_y = -2;
-                }
-            } else {
-                direction_y = 1;
-            }
-
-            player_x = player_x + direction_x;
-            player_y = player_y + direction_y;
-            SPRITES_XPOS[0] = player_x;
-            SPRITES_YPOS[0] = player_y;
+            return;
         }
     }
 }
 
-void init_screen() {
-    for(word i=0; i<40*25; i++) {
-        SCREEN[i] = level[i];
+void sprite_enable(byte sprite_no, bool enable) {
+    byte mask = %00000001;
+    mask = mask << sprite_no;
+    if (enable) {
+        VICII->SPRITES_ENABLE = VICII->SPRITES_ENABLE | mask;
+    } else {
+        mask = ~mask;
+        VICII->SPRITES_ENABLE = VICII->SPRITES_ENABLE & mask;
     }
 }
 
-void init_color_map() {
-    for(word i=0; i<40*25; i++) {
-        COLS[i] = PURPLE;
+void sprite_position(byte sprite_no, word x, word y) {
+    byte index = <mul8u(sprite_no, 2);
+    SPRITES_XPOS[index]  = <x;
+    SPRITES_YPOS[index]  = <y;
+
+    byte mask = %00000001;
+    mask = mask << sprite_no;
+
+    if (>x > 0) {
+        SPRITES_XMSB[0] = SPRITES_XMSB[0] | mask;
+    } else {
+        SPRITES_XMSB[0] = SPRITES_XMSB[0] & ~mask;
     }
 }
-
-void init_charset() {
-    for (char i: 0..MAX_CHARS * 8) {
-        CHARSET[i] = tiles[i];
-    }
-}
-
-void build_sprite(byte *spr) {
-    for (char i: 0..63) {
-        SPRITE_1[i] = spr[i];
-    }
-}
-
-
-byte tiles[MAX_CHARS*8] = {
-    %00000000,
-    %00000000,
-    %00000000,
-    %00000000,
-    %00000000,
-    %00000000,
-    %00000000,
-    %00000000,
-
-    %01111110,
-    %10101011,
-    %10010111,
-    %10101011,
-    %10010111,
-    %10101011,
-    %10111111,
-    %01111110,
-
-    %00000000,
-    %00000000,
-    %01000000,
-    %01001100,
-    %00110000,
-    %00110100,
-    %00011000,
-    %00011000,
-
-    %00000000,
-    %00011100,
-    %00100010,
-    %00100010,
-    %00011100,
-    %00000100,
-    %00001100,
-    %00000100
-};
-
-byte sprite1[3*21] = {
-    %00000000,%00000000,%00000000,
-    %00000000,%00111100,%00000000,
-    %00000000,%01111110,%00000000,
-    %00000000,%11011011,%00000000,
-    %00000000,%11011011,%00000000,
-    %00000000,%11111111,%00000000,
-    %00000000,%11111111,%00000000,
-    %00000000,%01111110,%00000000,
-    %00000000,%00111100,%00000000,
-    %00000000,%00011000,%00000000,
-    %00000000,%00111100,%00000000,
-    %00000000,%01111110,%00000000,
-    %00000000,%11011011,%00000000,
-    %00000011,%10011001,%11000000,
-    %00000111,%00011000,%11100000,
-    %00000010,%00111100,%01000000,
-    %00000000,%01100110,%00000000,
-    %00000000,%11000011,%00000000,
-    %00000000,%11000011,%00000000,
-    %00000000,%11000011,%00000000,
-    %00000001,%10000001,%10000000,
-};
-
-byte level[40*25] = {
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,0,0,0,0,3,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,2,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,
-  1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-};
