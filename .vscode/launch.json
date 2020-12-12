@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"configurations": [
+		{
+			"type": "kickassembler",
+			"request": "launch",
+			"name": "Debug build/game.prg file",
+			"program": "${workspaceFolder}/build/game.asm",
+			"binDirectory": "${workspaceFolder}/build",
+		}
+	]
+}

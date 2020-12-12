@@ -1,59 +1,41 @@
-# c64_kickc.mk
+# kickc_rake
 
-Example project for C64 KickC
+Example rake project for KickC
 
 ## Usage
 
 ```bash
-*[main][~/game]$ make help
-Help:
-  make start               build and start emulator (optionally with name of program)
-  make debug               build and run in debugger (optionally with name of program)
-  make clean               clean build directory
-  make compile             compile KICK C source files (src/*.c)
+*[main][~/game]$ rake -T
+rake clean                 # clean project
+rake compile_all           # compile all src/*.c programs
+rake compile_asm[program]  # assemble all build/*.asm programs
+rake compile_c[program]    # compile program
+rake debug[program]        # compile & debug program
+rake init_project          # initialize project (from level of kickc folder stored in kickc release)
+rake list_programs         # list available programs
+rake start[program]        # compile & run program
 ```
 
 Basic Build & Run in Vice
 ```bash
-*[main][~/game]$ make
+*[main][~/game]$ rake
 ...
 ```
 
 Basic Build & Run in C64Debugger
 ```bash
-*[main][~/game]$ make debug
-...
-```
-Verbose Build & Run in Vice
-```bash
-*[main][~/game]$ VERBOSE=true make
+*[main][~/game]$ rake debug
 ...
 ```
 
 Build & Run Specific Prg in Vice
 ```bash
-*[main][~/game]$ make start empty
+*[main][~/game]$ rake start
 ...
 ```
 
 Build & Run Specific Prg in C64Debugger
 ```bash
-*[main][~/game]$ make debug empty
+*[main][~/game]$ rake debug PROGRAM=empty
 ...
 ```
-
-## Configuration
-
-In Makefile you can override paths or other configurations (in this case debugger and vice are available in PATH)
-
-```Makefile
-DEFAULT_PRG = game
-DEBUGGER_PATH = C64Debugger
-VICE_PATH     = x64sc
-
-include c64_kickc.mk
-```
-
-## Examples
-
-In order to run examples, you need to copy them to src directory

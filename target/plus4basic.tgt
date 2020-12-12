@@ -1,9 +1,0 @@
-{
-    "extension": "prg",
-    "link": "plus4basic.ld",
-    "cpu": "MOS6502X",
-    "emulator": "xplus4",
-    "defines": {
-        "__PLUS4__": 1
-    }
-}
