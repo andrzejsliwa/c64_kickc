@@ -1,0 +1,8 @@
+{
+    "command-runner.terminal.name": "runCommand",
+    "command-runner.terminal.autoClear": true,
+    "command-runner.terminal.autoFocus": true,
+    "command-runner.commands": {
+        "debug file": "rake debug PROGRAM=${fileBasenameNoExtension}"
+    }
+}

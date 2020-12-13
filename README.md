@@ -2,6 +2,25 @@
 
 Example rake project for KickC
 
+
+## Prerequires
+
+- install ruby/rake
+
+- install Command Runner extension - https://marketplace.visualstudio.com/items?itemName=edonet.vscode-command-runner
+
+- install Kick Assembler studio extensions - https://marketplace.visualstudio.com/items?itemName=sanmont.kickass-studio
+
+- configure Keyboard shortcut:
+```json
+    {
+        "key": "f6",
+        "command": "command-runner.run",
+        "args": { "command": "debug file" }
+    }
+```
+- open project in vscode
+
 ## Usage
 
 ```bash
