@@ -3,7 +3,7 @@ require 'fileutils'
 DEBUGGER_PATH = '/Applications/C64\ Debugger.app/Contents/MacOS/C64Debugger'
 EMULATOR_PATH = '/usr/local/bin/x64sc'
 
-PROGRAM = 'game' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
+PROGRAM = 'animation' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
 BUILD_DIR = 'build'
 SOURCE_DIR = 'src'
 

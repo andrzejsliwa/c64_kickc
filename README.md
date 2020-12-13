@@ -24,7 +24,7 @@ Example rake project for KickC
 ## Usage
 
 ```bash
-*[main][~/game]$ rake -T
+*[main][~/c64_kickc]$ rake -T
 rake clean                 # clean project
 rake compile_all           # compile all src/*.c programs
 rake compile_asm[program]  # assemble all build/*.asm programs
@@ -37,24 +37,24 @@ rake start[program]        # compile & run program
 
 Basic Build & Run in Vice
 ```bash
-*[main][~/game]$ rake
+*[main][~/c64_kickc]$ rake
 ...
 ```
 
 Basic Build & Run in C64Debugger
 ```bash
-*[main][~/game]$ rake debug
+*[main][~/c64_kickc]$ rake debug
 ...
 ```
 
 Build & Run Specific Prg in Vice
 ```bash
-*[main][~/game]$ rake start
+*[main][~/c64_kickc]$ rake start
 ...
 ```
 
 Build & Run Specific Prg in C64Debugger
 ```bash
-*[main][~/game]$ rake debug PROGRAM=empty
+*[main][~/c64_kickc]$ rake debug PROGRAM=color_sprites_
 ...
 ```
