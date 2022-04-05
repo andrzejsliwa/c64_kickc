@@ -1,7 +1,7 @@
 lda {m2}+1
 sta {m1}
-and #$80
-beq !+
-lda #$ff
+ora #$7f
+bmi !+
+lda #0
 !:
 sta {m1}+1

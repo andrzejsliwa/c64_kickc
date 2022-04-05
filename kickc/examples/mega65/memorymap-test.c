@@ -5,8 +5,8 @@
 #include <mega65.h>
 
 void main() {
-    char * BLOCK_4000 = 0x4000;
-    char * BLOCK_8000 = 0x8000;
+    char * BLOCK_4000 = (char*)0x4000;
+    char * BLOCK_8000 = (char*)0x8000;
 
     // Remap [$4000-$5fff] to point to [$10000-$11fff]
     memoryRemapBlock(0x40, 0x100);
@@ -26,11 +26,11 @@ void main() {
     BLOCK_8000[4] = BLOCK_4000[2];
     BLOCK_4000[5] = BLOCK_8000[1];
 
-    // copy the resulting values onto the screen
+    // copy the resulting values onto the screen - it should show '-*-*-*'
     for(char i=0;i<6;i++)
         (DEFAULT_SCREEN+80-6)[i] = BLOCK_4000[i];
 
-    // Remap [$4000-$5fff] to both point to [$ff80000-$ff81fff] COLORAM! (notice usage of page offsets)
+    // Remap [$4000-$5fff] to point to [$ff80000-$ff81fff] COLORRAM! (notice usage of page offsets)
     memoryRemap256M(MEMORYBLOCK_4000, 0xff800-0x00040, 0);
     // Put colors in the upper screen line
     for( char i=0; i<16; i++) 

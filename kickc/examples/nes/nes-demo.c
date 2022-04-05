@@ -30,7 +30,7 @@ void main() {
 }
 
 // NMI Called when the PPU refreshes the screen (also known as the V-Blank period)
-interrupt(hardware_stack) void vblank() {
+__interrupt void vblank() {
 
    // Read controller 1
     char joy = readJoy1();
@@ -108,18 +108,18 @@ char PALETTE[0x20] = {
 
 // Tile Set (in CHR ROM)
 #pragma data_seg(Tiles)
-export char TILES[] = kickasm(resource "smb1_chr.bin") {{
+__export char TILES[] = kickasm(resource "smb1_chr.bin") {{
 	.import binary "smb1_chr.bin"
 }};
 
 // Sprite Buffer (in GAME RAM)
 // Will be transferred to the PPU via DMA during vblank
 #pragma data_seg(GameRam)
-struct SpriteData align(0x100) SPRITE_BUFFER[0x40];
+struct SpriteData __align(0x100) SPRITE_BUFFER[0x40];
 
 // Interrupt Vectors (in PRG ROM)
 #pragma data_seg(Vectors)
-export void()* const VECTORS[] = { 
+__export void (*VECTORS[])() = {
     // NMI Called when the PPU refreshes the screen (also known as the V-Blank period)
     &vblank, 
     // RESET Called when the NES is reset, including when it is turned on.

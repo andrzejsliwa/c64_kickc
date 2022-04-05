@@ -1,0 +1,8 @@
+language: asm
+sudo: false
+script:
+  - ./gradlew
+notifications:
+  email:
+    on_success: change
+    on_failure: change

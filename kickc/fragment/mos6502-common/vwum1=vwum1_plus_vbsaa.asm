@@ -1,8 +1,8 @@
-pha
 clc
+sta $ff
 adc {m1}
 sta {m1}
-pla
+lda $ff
 ora #$7f
 bmi !+
 lda #0

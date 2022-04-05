@@ -1,5 +1,5 @@
 // DYPP (Different Y Pixel Position) LOGO created using DMA
-// Graphics mode is 320x200 full-colour super extended attribute mode text-mode
+// Graphics mode is 45x25 full-colour super extended attribute mode text-mode
 // Character layout is column-wise giving linear addressing of the graphics (one byte per pixel)
 
 #pragma target(mega65)
@@ -9,9 +9,9 @@
 #include <string.h>
 
 // The screen address (45*25*2=0x08ca bytes)
-char * const SCREEN = 0x5000;
+char * const SCREEN = (char*)0x5000;
 // The charset address (45*32*8=0x2d00 bytes)
-char * const CHARSET = 0x6000;
+char * const CHARSET = (char*)0x6000;
 // A logo in column-wide linear single-color memory layout
 char LOGO[45*25*8]  = kickasm(resource "camelot.png") {{
 	.var pic = LoadPicture("camelot.png", List().add($ffffff, $000000))
@@ -25,6 +25,12 @@ void main() {
     SEI();
     // Map memory to BANK 0 : 0x00XXXX - giving access to I/O
     memoryRemap(0,0,0);
+    // Enable 48MHz fast mode
+    VICIV->CONTROLB |= 0x40;
+    VICIV->CONTROLC |= 0x40;
+    // Enable the VIC 4
+    VICIV->KEY = 0x47;
+    VICIV->KEY = 0x53;
     // Set sideborder width=0, disable raster delay and hot registers
     VICIV->SIDBDRWD_LO = 0;
     VICIV->SIDBDRWD_HI = 0;   
@@ -33,12 +39,6 @@ void main() {
     VICIV->TBDRPOS_HI = 0;
     VICIV->BBDRPOS_LO = 0;
     VICIV->BBDRPOS_HI = 2;
-    // Enable 48MHz fast mode
-    VICIV->CONTROLB |= 0x40;
-    VICIV->CONTROLC |= 0x40;
-    // Enable the VIC 4
-    VICIV->KEY = 0x47;
-    VICIV->KEY = 0x53;
     // Enable Super Extended Attribute Mode
     VICIV->CONTROLC |= 1;
     // Mode 40x25 chars - will be 45*25 when utilizing the borders
@@ -51,13 +51,13 @@ void main() {
     // Set number of characters to display per row
     VICIV->CHRCOUNT = 45;
     // Set exact screen address
-    VICIV->SCRNPTR_LOLO = <SCREEN;
-    VICIV->SCRNPTR_LOHI = >SCREEN;
+    VICIV->SCRNPTR_LOLO = BYTE0(SCREEN);
+    VICIV->SCRNPTR_LOHI = BYTE1(SCREEN);
     VICIV->SCRNPTR_HILO = 0;
     VICIV->SCRNPTR_HIHI = 0;
     // Set exact charset address
-    VICIV->CHARPTR_LOLO = <CHARSET;
-    VICIV->CHARPTR_LOHI = >CHARSET;
+    VICIV->CHARPTR_LOLO = BYTE0(CHARSET);
+    VICIV->CHARPTR_LOHI = BYTE1(CHARSET);
     VICIV->CHARPTR_HILO = 0;
     
     // Enable Full-Colour Mode
@@ -66,7 +66,7 @@ void main() {
     // Fill the screen with 0
     memset_dma(SCREEN, 0, 45*25*2);
     // Fill the colours with WHITE - directly into $ff80000
-    memset_dma256(0xff,0x08,0x0000, WHITE, 45*25*2);
+    memset_dma256(0xff,0x08,(void*)0x0000, WHITE, 45*25*2);
     // Fill the charset with 0x55
     memset_dma(CHARSET, 0x55, 45*32*8);
 
@@ -95,10 +95,9 @@ void main() {
         logo_src += 25*8;
     }
 
+ 
     // Loop forever
     for(;;) {        
         VICIV->BG_COLOR = VICII->RASTER;
     }
 }
-
-

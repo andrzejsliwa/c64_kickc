@@ -1,0 +1,25 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build kickass build/game.asm",
+			"command": "/Users/andrzejsliwa/.sdkman/candidates/java/current/bin/java",
+			"args": [
+				"-jar",
+				"/Applications/KickAssembler/KickAss.jar",
+				"-odir",
+				"./bin",
+				"-log",
+				"buildlog.txt",
+				"-showmem",
+				"-debugdump",
+				"-vicesymbols",
+				"build/game.asm"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+	]
+}

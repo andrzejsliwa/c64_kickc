@@ -40,9 +40,9 @@ char divr8u(char dividend, char divisor, char rem) {
 // Divide unsigned 16-bit unsigned long dividend with a 8-bit unsigned char divisor
 // The 8-bit unsigned char remainder can be found in rem8u after the division
 unsigned int div16u8u(unsigned int dividend, unsigned char divisor) {
-  unsigned char quotient_hi = divr8u(>dividend, divisor, 0);
-  unsigned char quotient_lo = divr8u(<dividend, divisor, rem8u);
-  unsigned int quotient = { quotient_hi, quotient_lo};
+  unsigned char quotient_hi = divr8u(BYTE1(dividend), divisor, 0);
+  unsigned char quotient_lo = divr8u(BYTE0(dividend), divisor, rem8u);
+  unsigned int quotient = MAKEWORD( quotient_hi, quotient_lo );
   return quotient;
 }
 
@@ -57,7 +57,7 @@ unsigned int divr16u(unsigned int dividend, unsigned int divisor, unsigned int r
     unsigned int quotient = 0;
     for( char i : 0..15) {
         rem = rem << 1;
-        if( (>dividend & $80) != 0 ) {
+        if( (BYTE1(dividend) & $80) != 0 ) {
             rem = rem | 1;
         }
         dividend = dividend << 1;
@@ -71,6 +71,14 @@ unsigned int divr16u(unsigned int dividend, unsigned int divisor, unsigned int r
     return quotient;
 }
 
+// Performs modulo on two 16 bit unsigned ints and an initial remainder
+// Returns the remainder.
+// Implemented using simple binary division
+unsigned int modr16u(unsigned int dividend, unsigned int divisor, unsigned int rem) {
+    divr16u(dividend, divisor, rem);
+    return rem16u;
+}
+
 // Performs division on two 16 bit unsigned ints
 // Returns the quotient dividend/divisor.
 // The remainder will be set into the global variable rem16u
@@ -82,9 +90,9 @@ unsigned int div16u(unsigned int dividend, unsigned int divisor) {
 // Divide unsigned 32-bit unsigned long dividend with a 16-bit unsigned int divisor
 // The 16-bit unsigned int remainder can be found in rem16u after the division
 unsigned long div32u16u(unsigned long dividend, unsigned int divisor) {
-  unsigned int quotient_hi = divr16u(>dividend, divisor, 0);
-  unsigned int quotient_lo = divr16u(<dividend, divisor, rem16u);
-  unsigned long quotient = { quotient_hi, quotient_lo};
+  unsigned int quotient_hi = divr16u(WORD1(dividend), divisor, 0);
+  unsigned int quotient_lo = divr16u(WORD0(dividend), divisor, rem16u);
+  unsigned long quotient = MAKELONG( quotient_hi, quotient_lo );
   return quotient;
 }
 

@@ -7,11 +7,17 @@
 // The screen height
 #define CONIO_HEIGHT 23
 // The text screen address
-char * const CONIO_SCREEN_TEXT = DEFAULT_SCREEN;
+#ifndef CONIO_SCREEN_TEXT
+#define CONIO_SCREEN_TEXT DEFAULT_SCREEN
+#endif
 // The color screen address
-char * const CONIO_SCREEN_COLORS = DEFAULT_COLORRAM;
+#ifndef CONIO_SCREEN_COLORS
+#define CONIO_SCREEN_COLORS DEFAULT_COLORRAM
+#endif
 // The default text color
-const char CONIO_TEXTCOLOR_DEFAULT = BLUE;
+#ifndef CONIO_TEXTCOLOR_DEFAULT
+#define CONIO_TEXTCOLOR_DEFAULT BLUE
+#endif
 
 // Use the shared CMB flat memory implementation
 #include "conio-cbm-shared.c"
@@ -22,7 +28,7 @@ const char CONIO_TEXTCOLOR_DEFAULT = BLUE;
 // Set initial cursor position
 void conio_vic20_init() {
     // Position cursor at current line
-    char * const BASIC_CURSOR_LINE = 0xD6;
+    char * const BASIC_CURSOR_LINE = (char*)0xD6;
     char line = *BASIC_CURSOR_LINE;
     if(line>=CONIO_HEIGHT) line=CONIO_HEIGHT-1;
     gotoxy(0, line);

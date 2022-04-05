@@ -37,10 +37,12 @@ __address(0x2c00) char SINE[256] = kickasm {{
 // Moving Raster Bars
 __address(0x3000) char rasters[RASTER_LINES];
 
+typedef void (*PROC_PTR)();
+
 // Pointer to the song init routine
-void()* songInit = (void()*) SONG;
+PROC_PTR songInit = (PROC_PTR) SONG;
 // Pointer to the song play routine
-void()* songPlay = (void()*) SONG+3;
+PROC_PTR songPlay = (PROC_PTR) SONG+3;
 
 void main() {
     // Enable MEGA65 features
@@ -102,7 +104,7 @@ volatile char greet_zoomx;
 volatile char greet_idx;
 
 // BIG INTERRUPT LOOP
-interrupt(hardware_stack) void irq() {
+__interrupt(hardware_clobber) void irq() {
     // force NTSC every frame (hehe)
     VICIV->RASLINE0 |= 0x80;
     // Acknowledge the IRQ

@@ -1,10 +1,11 @@
 require 'fileutils'
 
-DEBUGGER_PATH = '/Applications/C64\ Debugger.app/Contents/MacOS/C64Debugger'
-EMULATOR_PATH = '/usr/local/bin/x64sc'
+DEBUGGER_PATH = '/Applications/C64\ Debugger.app/Contents/MacOS/C64\ Debugger'
+EMULATOR_PATH = '/Applications/Vice/x64.app/Contents/MacOS/x64'
 
-PROGRAM = 'animation' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
+PROGRAM = 'print' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
 BUILD_DIR = 'build'
+RELATIVE_BUILD_DIR = File.join("..", BUILD_DIR)
 SOURCE_DIR = 'src'
 
 is_windows = Gem.win_platform?
@@ -61,34 +62,71 @@ task :compile_c, :program do |_, args|
   Rake::Task['setup_build'].invoke
 
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
-  sh "#{KICKC_SCRIPT} #{File.join("src", "#{file}.c")} -odir=#{BUILD_DIR}"
+  file_path = File.join("src", "#{file}.c")
+
+  if File.exist?(File.join(file_path))
+    sh "#{KICKC_SCRIPT} #{file_path} -odir=#{BUILD_DIR}"
+  end
 end
 
-desc 'assemble all build/*.asm programs'
-task :compile_asm, :program do |_, args|
+desc 'convert all (src)/*.bas'
+task :compile_bas, :program do |_, args|
+  Rake::Task['setup_build'].invoke
+
+  file = args[:program] || ENV["PROGRAM"] || PROGRAM
+
+  build_file = File.join("src", "#{file}.bas")
+  cmd = %{
+    petcat -w2
+        -o #{BUILD_DIR}/#{file}.prg
+        -- #{build_file}
+  }.split.join(" ")
+  sh cmd
+end
+
+desc 'assemble all (build|src)/*.s programs'
+task :compile_asm, :program, :options do |_, args|
   Rake::Task['compile_c'].invoke
 
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
+
+  build_file =
+    if File.exist?(File.join("src", "#{file}.s"))
+      File.join("src", "#{file}.s")
+    else
+      File.join("build", "#{file}.asm")
+    end
+
   cmd = %{
-      java -jar kickass/KickAss.jar build/#{file}.asm
-          -bytedumpfile #{File.join(BUILD_DIR, "#{file}.bytedump")}
-          -o build/#{file}.prg
+      java -jar kickass/KickAss.jar #{build_file}
+          -bytedumpfile ../#{BUILD_DIR}/#{file}.bytedump
+          -o #{BUILD_DIR}/#{file}.prg
           -afo
           -aom
           -showmem
           -debugdump
           -vicesymbols
+          -libdir ./lib
           -symbolfile
-          -symbolfiledir #{BUILD_DIR}
+          -symbolfiledir ../#{BUILD_DIR}
+          #{args[:options]}
   }.split.join(" ")
   sh cmd
 end
 
-desc 'compile all src/*.c programs'
+desc 'compile all src/*.(c|s|bas) programs'
 task :compile_all do
   Dir['src/*.c'].each do |fullpath|
     file = File.basename(fullpath, '.c')
     Rake::Task['compile_asm'].execute(program: file)
+  end
+  Dir['src/*.s'].each do |fullpath|
+    file = File.basename(fullpath, '.s')
+    Rake::Task['compile_asm'].execute(program: file)
+  end
+  Dir['src/*.bas'].each do |fullpath|
+    file = File.basename(fullpath, '.bas')
+    Rake::Task['compile_bas'].execute(program: file)
   end
 end
 
@@ -104,24 +142,65 @@ task :start, :program do |_, args|
   sh cmd
 end
 
+desc 'convert & run basic program'
+task :start_basic, :program do |_, args|
+  file = args[:program] || ENV["PROGRAM"] || PROGRAM
+
+  Rake::Task['compile_bas'].execute(program: file)
+  cmd = %{#{EMULATOR_PATH}
+    -basicload #{File.join(BUILD_DIR, "#{file}.prg")}
+  }.split.join(" ")
+  sh cmd
+end
+
 desc 'compile & debug program'
 task :debug, :program do |_, args|
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
 
+  sh "killall C64\ Debugger || true"
   Rake::Task['compile_asm'].execute(program: file)
   sh %{#{DEBUGGER_PATH}
     -prg #{File.join(BUILD_DIR, "#{file}.prg")}
-    -pass -unpause -autojmp -wait 250
+    -pass -unpause -autojmp -wait 3000
     #{OPTIONS}
   }.split.join(" ")
 end
 
+desc 'compile & test program'
+task :test, :program do |_, args|
+  file = args[:program] || ENV["PROGRAM"] || PROGRAM
+
+  options = %{:on_exit=jam
+    :write_final_results_to_file=true
+    :result_file_name=#{file}.specOut
+  }
+  Rake::Task['compile_asm'].execute(program: file, options: options)
+  cmd = %{#{EMULATOR_PATH}
+    -autostart build/#{file}.prg
+    -warp
+    -jamaction 5
+    -console
+    -autostartprgmode 0
+    #{OPTIONS}
+  }.split.join(" ")
+  sh cmd
+
+  sh "petcat build/#{file}.specOut"
+end
+
 desc 'list available programs'
 task :list_programs do
-  puts "Available programs:"
-  Dir[File.join('src', '*.c')].each do |fullpath|
-    file = File.basename(fullpath, '.c')
-    puts "  #{file}"
+  puts "Available programs !(name and its full path):"
+
+  all = []
+  Dir[File.join('src', '*.{c,s,bas}')].each do |fullpath|
+    file = File.basename(fullpath, '.*')
+    all << {file: file, fullpath: fullpath}
+  end
+
+  padding = all.map { |f| f[:file].size }.max
+  all.each do |f|
+    puts "  #{f[:file].ljust(padding + 1)} #{f[:fullpath]}"
   end
 end
 task default: :start
