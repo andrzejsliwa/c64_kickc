@@ -1,5 +1,5 @@
 #import "FuncARGS.i"
-#import "../memoryMap/KERNAL.i"
+#import "../memory-map/KERNAL.i"
 .namespace Print {
 
 // +----------------------------------+

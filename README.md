@@ -17,6 +17,16 @@ Example rake project for KickC
         "key": "f6",
         "command": "command-runner.run",
         "args": { "command": "debug file" }
+    },
+    {
+        "key": "f5",
+        "command": "command-runner.run",
+        "args": { "command": "run file" }
+    },
+    {
+        "key": "f4",
+        "command": "command-runner.run",
+        "args": { "command": "run basic file" }
     }
 ```
 

@@ -1,0 +1,13 @@
+Output dir: C:\Users\andrz\c64_kickc\src\tooling\bin
+parsing
+flex pass 1
+flex pass 2
+Output pass
+Writing prg file: FuncARGS.prg
+
+Memory Map
+----------
+Default-segment:
+  $2000-$2019 Default
+
+Writing Symbol file: FuncARGS.sym

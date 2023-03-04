@@ -1,14 +1,26 @@
 require 'fileutils'
 
-DEBUGGER_PATH = '/Applications/C64\ Debugger.app/Contents/MacOS/C64\ Debugger'
-EMULATOR_PATH = '/Applications/Vice/x64.app/Contents/MacOS/x64'
+is_windows = Gem.win_platform?
 
-PROGRAM = 'print' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
+DEBUGGER_PATH = 
+  if is_windows
+    'START /B C:\c64\C64Debugger\C64Debugger.exe'
+  else
+    '/Applications/C64\ Debugger.app/Contents/MacOS/C64\ Debugger'
+  end  
+EMULATOR_PATH = 
+  if is_windows 
+    'START /B C:\c64\SDL2VICE-3.7-win64\x64sc.exe'
+  else
+    '/Applications/Vice/x64.app/Contents/MacOS/x64'
+  end
+
+PROGRAM = 'intro' # IF YOU NEED TO CHANGE DEFAULT PROGRAM NAME - CHANGE IT HERE!!!
 BUILD_DIR = 'build'
 RELATIVE_BUILD_DIR = File.join("..", BUILD_DIR)
 SOURCE_DIR = 'src'
 
-is_windows = Gem.win_platform?
+
 
 KICKC_SCRIPT = if is_windows
                  File.join("kickc","bin","kickc.bat")
@@ -17,7 +29,7 @@ KICKC_SCRIPT = if is_windows
                end
 
 OPTIONS = if is_windows
-            ''
+            ' >nul'
           else
             ' 2>&1 > /dev/null &'
           end
@@ -134,6 +146,10 @@ desc 'compile & run program'
 task :start, :program do |_, args|
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
 
+  if is_windows
+    sh "taskkill /IM x64sc.exe >nul" do |ok,res|
+    end
+  end
   Rake::Task['compile_asm'].execute(program: file)
   cmd = %{#{EMULATOR_PATH}
     #{File.join(BUILD_DIR, "#{file}.prg")}
@@ -157,7 +173,6 @@ desc 'compile & debug program'
 task :debug, :program do |_, args|
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
 
-  sh "killall C64\ Debugger || true"
   Rake::Task['compile_asm'].execute(program: file)
   sh %{#{DEBUGGER_PATH}
     -prg #{File.join(BUILD_DIR, "#{file}.prg")}
@@ -169,10 +184,9 @@ end
 desc 'compile & test program'
 task :test, :program do |_, args|
   file = args[:program] || ENV["PROGRAM"] || PROGRAM
-
   options = %{:on_exit=jam
-    :write_final_results_to_file=true
-    :result_file_name=#{file}.specOut
+   :write_final_results_to_file=true
+   :result_file_name=#{file}.specOut 
   }
   Rake::Task['compile_asm'].execute(program: file, options: options)
   cmd = %{#{EMULATOR_PATH}

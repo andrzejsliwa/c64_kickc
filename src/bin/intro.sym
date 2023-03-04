@@ -1,0 +1,25 @@
+.label argc=$200a
+.label FALLING_ORDER=$8e8
+.label end_move=$8b0
+.label start=$80e
+.label column=$8b3
+.label local_row=$8b1
+.namespace Tooling {
+  .label loopx=$2033
+  .label loopy=$2030
+  .label delay_inner=$203c
+  .label Delay=$201a {
+  }
+  .label delay_outer=$203b
+}
+.label setArgPtr=$2000
+.label character=$8b5
+.label SCREEN_ROW_MSB=$8cf
+.label SCREEN_ROW_LSB=$8b6
+.label loop=$80e
+.label continue=$83e
+.label local_column=$8b2
+.label move_down=$851
+.label move_loop=$857
+.label end=$850
+.label row=$8b4

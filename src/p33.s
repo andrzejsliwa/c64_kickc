@@ -7,7 +7,6 @@ start:
     jmp main
 
 #import "tooling/Print.i"
-#import "memoryMap/KERNAL.i"
 
 .encoding "petscii_upper"
 

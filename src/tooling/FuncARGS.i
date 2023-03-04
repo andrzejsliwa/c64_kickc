@@ -12,6 +12,11 @@
     lda ($fc),y
 }
 
+.macro FuncARGS_StoreATo(no) {
+    ldy #no
+    sta ($fc),y 
+}
+
 setArgPtr:
     sta argc+1
     clc

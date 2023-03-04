@@ -6,7 +6,6 @@
         "debug file": "rake debug PROGRAM=${fileBasenameNoExtension}",
         "run file": "rake start PROGRAM=${fileBasenameNoExtension}",
         "run basic file": "rake start_basic PROGRAM=${fileBasenameNoExtension}"
-
     },
 
     "files.associations": {

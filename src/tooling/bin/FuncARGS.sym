@@ -1,0 +1,2 @@
+.label argc=$200a
+.label setArgPtr=$2000

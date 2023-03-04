@@ -1,6 +1,6 @@
 [
     {
-        "key": "f6",
+        "key": "`",
         "command": "command-runner.run",
         "args": { "command": "debug file" }
     },
