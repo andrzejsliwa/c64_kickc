@@ -1,13 +1,7 @@
-//#import "tooling/FuncARGS.i"
-
 *=$0801 "Basic Upstart"
 :BasicUpstart2(start)
 
-// Main program
-//*=$c000 "Program"
-
 .const SPACE = $20
-
 start:
 loop:
     ldy column
@@ -54,8 +48,8 @@ move_down:
     sty local_column
 
 move_loop:
-	jsr Tooling.Delay
-	.byte 200, 1
+	// jsr Tooling.Delay
+	// .byte 200, 1
 
     lda local_row
     cmp #25
@@ -118,8 +112,6 @@ SCREEN_ROW_MSB: .fill 25, >[$0400 + i * 40]
 .var random_columns = columns.shuffle()
 
 FALLING_ORDER: 
-.for(var i=0;i<40;i++) {
-    .byte random_columns.get(i)
-}
+.fill 40, random_columns.get(i)
 
 #import "tooling/Tooling.i"
